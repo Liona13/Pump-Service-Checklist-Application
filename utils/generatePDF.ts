@@ -1,4 +1,28 @@
-import { TDocumentDefinitions, Content, ContentColumns, ContentTable, Style, TFontDictionary } from 'pdfmake/interfaces';
+import { TDocumentDefinitions, Content, ContentColumns, ContentTable, Style, TFontDictionary, PageBreak } from 'pdfmake/interfaces';
+import pdfMake from 'pdfmake/build/pdfmake';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+
+// Initialize pdfmake with fonts
+if (typeof window !== 'undefined') {
+  // @ts-ignore - pdfMake types are not properly defined
+  pdfMake.vfs = (pdfFonts as any).pdfMake?.vfs;
+}
+
+// Extend Window interface to include pdfMake
+declare global {
+  interface Window {
+    pdfMake?: {
+      vfs: { [key: string]: string };
+    };
+  }
+}
+
+// Define VFS interface
+interface VFSModule {
+  default: {
+    vfs: { [file: string]: string };
+  };
+}
 
 interface FormData {
   company: string;
@@ -63,12 +87,15 @@ interface Column {
   stack?: Content[];
 }
 
-interface VFSFonts {
-  [key: string]: string;
-}
-
-interface PdfFonts {
-  vfs: VFSFonts;
+interface VFSProvider {
+  pdfMake?: {
+    vfs?: { [key: string]: string };
+  };
+  default?: {
+    pdfMake?: {
+      vfs?: { [key: string]: string };
+    };
+  };
 }
 
 export async function generatePDF(formData: FormData, checkboxes: Checkboxes, language: 'en' | 'th'): Promise<Blob | null> {
@@ -77,10 +104,16 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
   }
 
   try {
-    // Import pdfmake dynamically
-    const pdfMake = (await import('pdfmake/build/pdfmake')).default;
-    const vfs = (await import('pdfmake/build/vfs_fonts')).default;
-    
+    // Register fonts - using default fonts from VFS
+    pdfMake.fonts = {
+      Roboto: {
+        normal: 'Roboto-Regular.ttf',
+        bold: 'Roboto-Medium.ttf',
+        italics: 'Roboto-Italic.ttf',
+        bolditalics: 'Roboto-MediumItalic.ttf'
+      }
+    };
+
     // Load images with size limit
     const maxImageSize = 500 * 1024; // 500KB limit
 
@@ -134,29 +167,6 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
       loadImage('/Logo.png'),
       loadImage('/QR.jpeg')
     ]);
-
-    // Set virtual file system for fonts
-    if (vfs && typeof vfs === 'object' && 'vfs' in vfs) {
-      pdfMake.vfs = vfs.vfs;
-    } else {
-      console.warn('VFS fonts not properly loaded');
-    }
-
-    // Register fonts
-    pdfMake.fonts = {
-      Roboto: {
-        normal: 'Roboto-Regular.ttf',
-        bold: 'Roboto-Medium.ttf',
-        italics: 'Roboto-Italic.ttf',
-        bolditalics: 'Roboto-MediumItalic.ttf'
-      },
-      THSarabunNew: {
-        normal: 'THSarabunNew.ttf',
-        bold: 'THSarabunNew-Bold.ttf',
-        italics: 'THSarabunNew-Italic.ttf',
-        bolditalics: 'THSarabunNew-BoldItalic.ttf'
-      }
-    };
 
     // Function to create checkbox item
     const createCheckboxItem = (checked: boolean, text: string): ContentColumns => {
@@ -214,11 +224,11 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
       createCheckboxItem(checkboxes.safety_training, 
         language === 'en' 
           ? `Safety Training required? ${formData.training_hours ? `(${formData.training_hours} hours)` : ''}`
-          : `ต้องการการฝึกอบรมความปลอดภัยหรือไม่? ${formData.training_hours ? `(${formData.training_hours} ชั่วโมง)` : ''}`),
+          : `ต้องรารการฝึกอบรมความปลอดภัยหรือไม่? ${formData.training_hours ? `(${formData.training_hours} ชั่วโมง)` : ''}`),
       createCheckboxItem(checkboxes.harmless_form,
         language === 'en' ? 'Declaration of Harmlessness form (in the operation manual)' : 'แบบฟอร์มการประกาศความไม่เป็นอันตราย (ในคู่มือการใช้งาน)'),
       createCheckboxItem(checkboxes.sds,
-        language === 'en' ? 'Safety Data Sheet (SDS) available' : 'มีเอกสารข้อมูลความปลอดภัย (SDS)'),
+        language === 'en' ? 'Safety Data Sheet (SDS) available' : 'มีเอกสารขมูลความปลอดภัย (SDS)'),
       createCheckboxItem(checkboxes.alignment_report,
         language === 'en' ? 'Alignment report available' : 'มีรายงานการปรับแนวเพลา'),
       createCheckboxItem(checkboxes.operation_records,
@@ -249,7 +259,7 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
       },
       importantNotes: {
         en: 'Important Notes:',
-        th: 'หมายเหตุสำคัญ:'
+        th: 'หลายเหตุำคัญ:'
       }
     };
 
@@ -257,25 +267,33 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
     const importantNotes = [
       {
         en: 'All work must be performed by qualified personnel only',
-        th: 'งทั้งหมดต้องดำเนิการโดยบุคลากรที่มีคุณสมบัติเท่านั้น'
+        th: 'งานทั้งหมดต้องดำเนินการโดยบุคลากรที่มีคุณสมบัติเท่านั้น'
       },
       {
         en: 'Maintain proper documentation throughout the service process',
-        th: 'รักษาเอกสารที่เหมาะสมตลอดกระบวนการให้บริการ'
+        th: 'รักษาเอกสารที่เหมาะสมลอดกระบวนการให้บริการ'
       },
       {
         en: 'Use only OEM parts or approved equivalents',
-        th: 'ใช้เฉพาะชิ้นส่วน OEM หรือชิ้นส่วนที่ได้รับการอนุมัติเท่านั้น'
+        th: 'ใช้เฉพาะชิ้นส่วน OEM หรือชิ้นส่วนที่ได้รับกรอนุมัติเท่านั้น'
       },
       {
         en: 'Follow all safety protocols, especially regarding magnetic coupling hazards',
         th: 'ปฏิบัติตามโปรโตคอลความปลอดภัยทั้งหมด โดยเฉพาะอย่างยิ่งเกี่ยวกับอันตรายจากการเชื่อมต่อแม่เหล็ก'
-      },
-      {
-        en: "Refer to manufacturer's manual for specific torque values and clearances",
-        th: 'อ้างอิงคู่มือของผู้ผลิตสำหรับค่าแรงบิดและระยะห่างที่เฉพาะเจาะจ'
       }
     ];
+
+    // Document header
+    const docHeader = {
+      company: { en: 'Water Field Asia Co., Ltd.', th: 'บริษัท วอเตอร์ฟิลด์ เอเชีย จำกัด' },
+      address1: { en: '623 Soi Onnut 70/1 Sub 2', th: '623 ซอยอ่อนนุช 70/1 แยก 2' },
+      address2: { en: 'Pravet Sub-District, Pravet District,', th: 'แขวงประเวศ เขตประเวศ' },
+      address3: { en: 'Bangkok 10250', th: 'กรุงเทพมหานคร 10250' },
+      phone: { en: 'Tel.: +66 2320 1994', th: 'โทร: +66 2320 1994' },
+      docNo: { en: 'Document No: FM-WFA-SER-057', th: 'เลขที่เอกสาร: FM-WFA-SER-057' },
+      revision: { en: 'Revision: 00', th: 'แก้ไขครั้งที่: 00' },
+      date: { en: 'Date: 15.11.2024', th: 'วันที่: 15.11.2024' }
+    };
 
     // Thai translations for form fields
     const translations = {
@@ -292,12 +310,12 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
       lastServiceDate: { en: 'Last Service Date:', th: 'วันที่เข้าซ่อมครั้งล่าสุด:' },
       installationDate: { en: 'Installation Date:', th: 'วันที่ติดตั้ง:' },
       temperature: { en: 'Temperature (°C):', th: 'อุณหภูมิ (°C):' },
-      flowRate: { en: 'Flow Rate (m³/h):', th: 'อัตราการไล (m³/h):' },
-      suctionPressure: { en: 'Suction Pressure (bar):', th: 'แรงดันด้านดูด (bar):' },
+      flowRate: { en: 'Flow Rate (m³/h):', th: 'อัตราการไหล (m³/h):' },
+      suctionPressure: { en: 'Suction Pressure (bar):', th: 'แรงดันด���านดูด (bar):' },
       dischargePressure: { en: 'Discharge Pressure (bar):', th: 'แรงดันด้านส่ง (bar):' },
-      totalHead: { en: 'Total Head (m):', th: 'เฮดรวม (m):' },
+      totalHead: { en: 'Total Head (m):', th: 'เฮดรมม (m):' },
       pumpedMedium: { en: 'Pumped Medium:', th: 'ของเหลวที่สูบ:' },
-      serviceReason: { en: 'Description of Issues/Reason for Service:', th: 'รายละเอียดปัญหา/เหตุผลในการเข้าซ่อม:' }
+      serviceReason: { en: 'Description of Issues/Reason for Service:', th: 'รายละเอียดปัญหา/เหตุผลในการเข้าซ่ม:' }
     };
 
     // Create table layout
@@ -315,18 +333,13 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
       }
     };
 
+    // Create document definition
     const docDefinition: TDocumentDefinitions = {
-      info: {
-        title: language === 'en' ? 'Pump Service Checklist' : 'รายการตรวจสอบการบริการปั๊ม',
-        author: 'Water Field Asia Co., Ltd.',
-        subject: language === 'en' ? 'Pre-Service Requirements' : 'ข้อกำหนดก่อนเข้าซ่อม',
-        keywords: 'pump, service, checklist'
-      },
       pageSize: 'A4',
       pageMargins: [40, 40, 40, 60],
       defaultStyle: {
-        font: language === 'en' ? 'Roboto' : 'THSarabunNew',
-        fontSize: language === 'en' ? 11 : 13,
+        font: 'Roboto',
+        fontSize: 11,
         lineHeight: 1.2,
         color: '#1F2937'
       },
@@ -335,150 +348,156 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
         {
           columns: [
             {
-              width: 200,
+              width: 150,
               image: logoBase64,
-              fit: [200, 100],
+              fit: [150, 75],
               margin: [0, 0, 20, 0]
             },
             {
               width: '*',
               stack: [
-                { text: language === 'en' ? 'Water Field Asia Co., Ltd.' : 'บริษัท วอเตอร์ฟิลด์ เอเชีย จำกัด', style: 'headerCompany' },
-                { text: language === 'en' ? '623 Soi Onnut 70/1 Sub 2' : '623 ซอยอ่อนนุช 70/1 แยก 2', style: 'headerAddress' },
-                { text: language === 'en' ? 'Pravet Sub-District, Pravet District,' : 'แขวงประเวศ เขตประเวศ', style: 'headerAddress' },
-                { text: language === 'en' ? 'Bangkok 10250' : 'กรุงเทพมหานคร 10250', style: 'headerAddress' },
-                { text: language === 'en' ? 'Tel.: +66 2320 1994' : 'โทร: +66 2320 1994', style: 'headerAddress' }
+                { text: docHeader.company[language], style: 'headerCompany' },
+                { text: docHeader.address1[language], style: 'headerAddress' },
+                { text: docHeader.address2[language], style: 'headerAddress' },
+                { text: docHeader.address3[language], style: 'headerAddress' },
+                { text: docHeader.phone[language], style: 'headerAddress' }
               ],
               margin: [0, 5, 0, 0]
             },
             {
               width: 'auto',
               stack: [
-                { text: language === 'en' ? 'Document No: FM-WFA-SER-057' : 'เลขที่เอกสาร: FM-WFA-SER-057', style: 'headerDoc' },
-                { text: language === 'en' ? 'Revision: 00' : 'แก้ไขครั้งที่: 00', style: 'headerDoc' },
-                { text: language === 'en' ? 'Date: 15.11.2024' : 'วันที่: 15.11.2024', style: 'headerDoc' },
+                { text: docHeader.docNo[language], style: 'headerDoc' },
+                { text: docHeader.revision[language], style: 'headerDoc' },
+                { text: docHeader.date[language], style: 'headerDoc' },
                 {
                   image: qrBase64,
-                  width: 80,
-                  margin: [0, 10, 0, 0],
+                  width: 60,
+                  height: 60,
+                  margin: [0, 5, 0, 0],
                   alignment: 'right'
                 }
               ],
               margin: [20, 5, 0, 0]
             }
           ],
-          margin: [0, 0, 0, 30]
+          margin: [0, 0, 0, 20]
         },
-        // Title with background
+        // Customer Details section
         {
-          canvas: [
+          unbreakable: true,
+          stack: [
             {
-              type: 'rect',
-              x: 0,
-              y: 0,
-              w: 515,
-              h: 40,
-              r: 4,
-              color: '#F3F4F6'
+              text: sectionTitles.customerDetails[language],
+              style: 'sectionHeader'
+            },
+            {
+              layout: 'lightHorizontalLines',
+              table: {
+                widths: ['30%', '70%'],
+                headerRows: 0,
+                body: [
+                  [{ text: translations.company[language], style: 'label' }, { text: formData.company || '-' }],
+                  [{ text: translations.siteLocation[language], style: 'label' }, { text: formData.site_location || '-' }],
+                  [{ text: translations.contactPerson[language], style: 'label' }, { text: formData.contact_person || '-' }],
+                  [{ text: translations.department[language], style: 'label' }, { text: formData.department || '-' }],
+                  [{ text: translations.phone[language], style: 'label' }, { text: formData.phone || '-' }],
+                  [{ text: translations.email[language], style: 'label' }, { text: formData.email || '-' }]
+                ]
+              }
             }
           ]
         },
+        // Pump Information section
         {
-          text: language === 'en' ? 'Pump Service Checklist' : 'รายการตรวจ��อบการบริการปั๊ม',
-          style: 'title',
-          margin: [0, -30, 0, 30] // Negative margin to overlay on canvas
+          unbreakable: true,
+          stack: [
+            {
+              text: sectionTitles.pumpInfo[language],
+              style: 'sectionHeader',
+              margin: [0, 20, 0, 10]
+            },
+            {
+              layout: 'lightHorizontalLines',
+              table: {
+                widths: ['30%', '70%'],
+                headerRows: 0,
+                body: [
+                  [{ text: translations.pumpModel[language], style: 'label' }, { text: formData.pump_model || '-' }],
+                  [{ text: translations.serialNumber[language], style: 'label' }, { text: formData.serial_number || '-' }],
+                  [{ text: translations.yearOfManufacture[language], style: 'label' }, { text: formData.manufacture_year || '-' }],
+                  [{ text: translations.operatingHours[language], style: 'label' }, { text: formData.operating_hours || '-' }],
+                  [{ text: translations.lastServiceDate[language], style: 'label' }, { text: formData.last_service_date || '-' }],
+                  [{ text: translations.installationDate[language], style: 'label' }, { text: formData.installation_date || '-' }]
+                ]
+              }
+            }
+          ]
         },
-        // 1. Customer Details
+        // Operating Conditions section
         {
-          text: sectionTitles.customerDetails[language],
-          style: 'sectionHeader'
+          unbreakable: true,
+          stack: [
+            {
+              text: sectionTitles.operatingConditions[language],
+              style: 'sectionHeader',
+              margin: [0, 20, 0, 10]
+            },
+            {
+              layout: 'lightHorizontalLines',
+              table: {
+                widths: ['30%', '70%'],
+                headerRows: 0,
+                body: [
+                  [{ text: translations.temperature[language], style: 'label' }, { text: formData.temperature || '-' }],
+                  [{ text: translations.flowRate[language], style: 'label' }, { text: formData.flow_rate || '-' }],
+                  [{ text: translations.suctionPressure[language], style: 'label' }, { text: formData.suction_pressure || '-' }],
+                  [{ text: translations.dischargePressure[language], style: 'label' }, { text: formData.discharge_pressure || '-' }],
+                  [{ text: translations.totalHead[language], style: 'label' }, { text: formData.total_head || '-' }],
+                  [{ text: translations.pumpedMedium[language], style: 'label' }, { text: formData.pumped_medium || '-' }]
+                ]
+              }
+            },
+            {
+              text: translations.serviceReason[language],
+              style: 'label',
+              margin: [0, 10, 0, 5]
+            },
+            {
+              text: formData.service_reason || '-',
+              margin: [0, 0, 0, 20]
+            }
+          ]
         },
+        // Customer Preparation Checklist section
         {
-          layout: 'lightHorizontalLines',
-          table: {
-            widths: ['30%', '70%'],
-            headerRows: 0,
-            body: [
-              [{ text: translations.company[language], style: 'label' }, { text: formData.company || '-' }],
-              [{ text: translations.siteLocation[language], style: 'label' }, { text: formData.site_location || '-' }],
-              [{ text: translations.contactPerson[language], style: 'label' }, { text: formData.contact_person || '-' }],
-              [{ text: translations.department[language], style: 'label' }, { text: formData.department || '-' }],
-              [{ text: translations.phone[language], style: 'label' }, { text: formData.phone || '-' }],
-              [{ text: translations.email[language], style: 'label' }, { text: formData.email || '-' }]
-            ]
-          }
+          unbreakable: true,
+          stack: [
+            {
+              text: sectionTitles.preparationChecklist[language],
+              style: 'sectionHeader',
+              margin: [0, 20, 0, 10]
+            },
+            {
+              stack: preServiceChecklist,
+              margin: [0, 10, 0, 20]
+            }
+          ]
         },
-        // 2. Pump Information
+        // Important Notes section
         {
-          text: sectionTitles.pumpInfo[language],
-          style: 'sectionHeader',
-          margin: [0, 20, 0, 10]
-        },
-        {
-          layout: 'lightHorizontalLines',
-          table: {
-            widths: ['30%', '70%'],
-            headerRows: 0,
-            body: [
-              [{ text: translations.pumpModel[language], style: 'label' }, { text: formData.pump_model || '-' }],
-              [{ text: translations.serialNumber[language], style: 'label' }, { text: formData.serial_number || '-' }],
-              [{ text: translations.yearOfManufacture[language], style: 'label' }, { text: formData.manufacture_year || '-' }],
-              [{ text: translations.operatingHours[language], style: 'label' }, { text: formData.operating_hours || '-' }],
-              [{ text: translations.lastServiceDate[language], style: 'label' }, { text: formData.last_service_date || '-' }],
-              [{ text: translations.installationDate[language], style: 'label' }, { text: formData.installation_date || '-' }]
-            ]
-          }
-        },
-        // 3. Operating Conditions
-        {
-          text: sectionTitles.operatingConditions[language],
-          style: 'sectionHeader',
-          margin: [0, 20, 0, 10]
-        },
-        {
-          layout: 'lightHorizontalLines',
-          table: {
-            widths: ['30%', '70%'],
-            headerRows: 0,
-            body: [
-              [{ text: translations.temperature[language], style: 'label' }, { text: formData.temperature || '-' }],
-              [{ text: translations.flowRate[language], style: 'label' }, { text: formData.flow_rate || '-' }],
-              [{ text: translations.suctionPressure[language], style: 'label' }, { text: formData.suction_pressure || '-' }],
-              [{ text: translations.dischargePressure[language], style: 'label' }, { text: formData.discharge_pressure || '-' }],
-              [{ text: translations.totalHead[language], style: 'label' }, { text: formData.total_head || '-' }],
-              [{ text: translations.pumpedMedium[language], style: 'label' }, { text: formData.pumped_medium || '-' }]
-            ]
-          }
-        },
-        {
-          text: translations.serviceReason[language],
-          style: 'label',
-          margin: [0, 10, 0, 5]
-        },
-        {
-          text: formData.service_reason || '-',
-          margin: [0, 0, 0, 20]
-        },
-        // 4. Customer Preparation Checklist
-        {
-          text: sectionTitles.preparationChecklist[language],
-          style: 'sectionHeader',
-          margin: [0, 20, 0, 10]
-        },
-        {
-          text: sectionTitles.preServiceRequirements[language],
-          style: 'subHeader',
-          margin: [0, 10, 0, 10]
-        },
-        ...preServiceChecklist,
-        {
-          text: sectionTitles.importantNotes[language],
-          style: 'subHeader',
-          margin: [0, 20, 0, 10]
-        },
-        {
-          ul: importantNotes.map(note => note[language]),
-          style: 'list'
+          unbreakable: true,
+          stack: [
+            {
+              text: sectionTitles.importantNotes[language],
+              style: 'subHeader',
+              margin: [0, 20, 0, 10]
+            },
+            {
+              ul: importantNotes.map(note => note[language]),
+              style: 'list'
+            }
+          ]
         }
       ],
       styles: {
@@ -493,18 +512,19 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
           fontSize: 16,
           bold: true,
           color: '#111827',
-          margin: [0, 0, 0, 8]
+          margin: [0, 0, 0, 5]
         },
         headerAddress: {
-          fontSize: 11,
+          fontSize: 10,
           color: '#4B5563',
-          lineHeight: 1.6
+          lineHeight: 1.4
         },
         headerDoc: {
           fontSize: 10,
           color: '#4B5563',
-          lineHeight: 1.6,
-          alignment: 'right'
+          lineHeight: 1.4,
+          alignment: 'right',
+          margin: [0, 0, 0, 2]
         },
         sectionHeader: {
           fontSize: 14,

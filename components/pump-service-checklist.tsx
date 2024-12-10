@@ -388,7 +388,7 @@ export default function PumpServiceChecklist() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="operating_hours" className="text-gray-700">
-                {language === 'en' ? 'Operating Hours (if available)' : 'ชั่วโมงการทำงาน (ถ้ามี)'}
+                {language === 'en' ? 'Operating Hours' : 'ชั่วโมงการทำงาน'}
               </Label>
               <Input 
                 id="operating_hours"
@@ -511,7 +511,7 @@ export default function PumpServiceChecklist() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="pumped_medium" className="text-gray-700">
-                {language === 'en' ? 'Pumped Medium' : 'ของเหลวที่ส���บ'}
+                {language === 'en' ? 'Pumped Medium' : 'ของเหลวที่สบบ'}
               </Label>
               <Input 
                 id="pumped_medium"
@@ -594,7 +594,7 @@ export default function PumpServiceChecklist() {
                   <Label htmlFor="harmless_form" className="text-sm">
                     {language === 'en' 
                       ? 'Declaration of Harmlessness form (in the operation manual)' 
-                      : 'แบบฟอร์มการประกาศความไม่เป็��อันตราย (ในคู่มือการใช้งาน)'}
+                      : 'แบบอร์มการประกาศความไม่เป็ออันตราย (ในคู่มือการใช้งาน)'}
                   </Label>
                 </div>
 
@@ -732,7 +732,7 @@ export default function PumpServiceChecklist() {
                   <Label htmlFor="pump_cleaned" className="text-sm">
                     {language === 'en' 
                       ? 'Pump cleaned externally' 
-                      : 'ทำความสะอาดภายนอกปั๊ม'}
+                      : 'ทำความสะอาดภายอกปั๊ม'}
                   </Label>
                 </div>
 
@@ -776,7 +776,7 @@ export default function PumpServiceChecklist() {
               <li>{language === 'en' ? 'All work must be performed by qualified personnel only' : 'งานทั้งหมดต้องดำเนินการโดยบุคลากรที่มีคุณสมบัติเท่านั้น'}</li>
               <li>{language === 'en' ? 'Follow all safety protocols and guidelines' : 'ปฏิบัติตามขั้นตอนและแนวทางด้านความปลอดภัยทั้งหมด'}</li>
               <li>{language === 'en' ? 'Maintain proper documentation throughout the service process' : 'รักษาเกสารที่เหมาะสมตลอดกระบวนการให้บริการ'}</li>
-              <li>{language === 'en' ? 'Use only OEM parts or approved equivalents' : 'ใช้เฉพาะชิ้นส่วน OEM หรือชิ้นส่วนที่ได้รับการอนุมัติเท่านั้น'}</li>
+              <li>{language === 'en' ? 'Use only OEM parts or approved equivalents' : 'ใช้เฉพาะช��้นส่วน OEM หรือชิ้นส่วนที่ได้รับการอนุมัติเท่านั้น'}</li>
               <li>{language === 'en' ? 'Follow all safety protocols, especially regarding magnetic coupling hazards' : 'ปฏิบัติตามโปรโตคอลความปลอดภัยทั้งหมด โดยเฉพาะอย่างยิ่งเกี่ยวกับอันตรายจากการเชื่อมต่อแม่เหล็ก'}</li>
               <li>{language === 'en' ? "Refer to manufacturer's manual for specific torque values and clearances" : 'อ้างอิงคู่มือของผู้ผลิตสำหรับค่าแรงบิดและระยะห่างที่เฉพาะเจาะจง'}</li>
               <li>{language === 'en' ? 'Required for magnetic coupling handling - keep sensitive items at minimum 1m distance' : 'จำเป็นสำหรับการจัดการการเชื่อมต่อแม่เหล็ก - เก็บรักษาอุปกรณ์ที่มีความอ่อนไหวในระยะห่างอย่างน้อย 1 เมตร'}</li>
