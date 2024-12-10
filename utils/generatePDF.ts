@@ -1,3 +1,5 @@
+// PDF Generation utility for Pump Service Checklist
+// Last updated: March 2024
 import { TDocumentDefinitions, Content, ContentColumns, ContentTable, Style, TFontDictionary, PageBreak } from 'pdfmake/interfaces';
 import pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
@@ -292,7 +294,7 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
       },
       {
         en: 'Use only OEM parts or approved equivalents',
-        th: 'ใช้เฉพาะชิ้นส่วน OEM หรือชิ้นส��วนที่ได้รับการอนุมัติเท่านั้น'
+        th: 'ใช้เฉพาะชิ้นส่วน OEM หรือชิ้นส่วนที่ได้รับการอนุมัติเท่านั้น'
       },
       {
         en: 'Follow all safety protocols, especially regarding magnetic coupling hazards',
@@ -310,7 +312,7 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
 
     // Document header
     const docHeader = {
-      company: { en: 'Water Field Asia Co., Ltd.', th: 'บริษ���ท วอเตอร์ฟิลด์ เอเชีย จำกัด' },
+      company: { en: 'Water Field Asia Co., Ltd.', th: 'บริษท วอเตอร์ฟิลด์ เอเชีย จำกัด' },
       address1: { en: '623 Soi Onnut 70/1 Sub 2', th: '623 ซอยอ่อนนุช 70/1 แยก 2' },
       address2: { en: 'Pravet Sub-District, Pravet District,', th: 'แขวงประเวศ เขตประเวศ' },
       address3: { en: 'Bangkok 10250', th: 'กรุงเทพมหานคร 10250' },
@@ -520,7 +522,7 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
                 createCheckboxItem(checkboxes.auxiliary_disconnected,
                   language === 'en' ? 'Auxiliary systems disconnected (e.g., external sensors)' : 'ระบบเสริมถูกตัดการเชื่อมต่อ (เช่น เซ็นเอรภายนอก)'),
                 createCheckboxItem(checkboxes.coupling_guard_removed,
-                  language === 'en' ? 'Coupling guard removed' : 'ฝาครอบคัปปลิ้งถูกถอดออก'),
+                  language === 'en' ? 'Coupling guard removed' : 'ฝาครอบคัปปลิ��งถูกถอดออก'),
                 createCheckboxItem(checkboxes.coupling_disconnected,
                   language === 'en' ? 'Coupling disconnected' : 'คัปปลิ้งถูกถอดออก'),
                 createCheckboxItem(checkboxes.pump_cleaned,
