@@ -169,11 +169,11 @@ export default function PumpServiceChecklist() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded-xl max-w-5xl mx-auto">
+    <form onSubmit={handleSubmit} className="bg-white shadow-2xl rounded-xl max-w-5xl mx-auto my-4 sm:my-8">
       {/* Language Switcher */}
-      <div className="border-b bg-gray-50/50">
-        <div className="px-6 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold text-gray-800">
+      <div className="border-b bg-gradient-to-b from-white to-gray-50/50">
+        <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h1 className="text-lg sm:text-xl font-semibold text-gray-900">
             {language === 'en' ? 'Pump Service Checklist' : 'รายการตรวจสอบการซ่อมบำรุงปั๊ม'}
           </h1>
           <div className="flex gap-2">
@@ -182,6 +182,7 @@ export default function PumpServiceChecklist() {
               onClick={() => changeLanguage('en')} 
               variant={language === 'en' ? "default" : "outline"}
               size="sm"
+              className={language === 'en' ? "bg-primary hover:bg-primary/90" : ""}
             >
               English
             </Button>
@@ -190,6 +191,7 @@ export default function PumpServiceChecklist() {
               onClick={() => changeLanguage('th')} 
               variant={language === 'th' ? "default" : "outline"}
               size="sm"
+              className={language === 'th' ? "bg-primary hover:bg-primary/90" : ""}
             >
               ไทย
             </Button>
@@ -198,22 +200,22 @@ export default function PumpServiceChecklist() {
       </div>
 
       {/* Company Header */}
-      <div className="p-6 border-b">
-        <div className="bg-gray-50/30 rounded-lg p-6">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-8">
-            <div className="space-y-4">
-              <div className="w-[200px] h-[100px] relative">
+      <div className="p-4 sm:p-6 border-b">
+        <div className="bg-gradient-to-b from-gray-50/30 to-white rounded-xl p-4 sm:p-6 shadow-sm">
+          <div className="flex flex-col lg:flex-row justify-between items-start gap-6 lg:gap-8">
+            <div className="space-y-4 w-full lg:w-auto">
+              <div className="w-[150px] sm:w-[200px] h-[75px] sm:h-[100px] relative">
                 <Image
                   src="/Logo.png"
                   alt={language === 'en' ? "Water Field Asia Co., Ltd. Logo" : "โลโก้ บริษัท วอเตอร์ฟิลด์ เอเชีย จำกัด"}
                   fill
-                  sizes="200px"
+                  sizes="(max-width: 640px) 150px, 200px"
                   priority
                   className="object-contain"
                 />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-800 mb-2">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
                   {language === 'en' ? "Water Field Asia Co., Ltd." : "บริษัท วอเตอร์ฟิลด์ เอเชีย จำกัด"}
                 </h2>
                 <div className="text-sm text-gray-600 space-y-1">
@@ -224,19 +226,19 @@ export default function PumpServiceChecklist() {
                 </div>
               </div>
             </div>
-            <div className="text-right space-y-4">
+            <div className="text-left lg:text-right space-y-4 w-full lg:w-auto">
               <div className="text-sm text-gray-600 space-y-1">
                 <p>{language === 'en' ? "Document No: FM-WFA-SER-057" : "เลขที่เอกสาร: FM-WFA-SER-057"}</p>
                 <p>{language === 'en' ? "Revision: 00" : "แก้ไขครั้งที่: 00"}</p>
                 <p>{language === 'en' ? "Date: 15.11.2024" : "วันที่: 15.11.2024"}</p>
               </div>
-              <div className="w-[100px] h-[100px] relative ml-auto">
+              <div className="w-[80px] sm:w-[100px] h-[80px] sm:h-[100px] relative ml-0 lg:ml-auto">
                 <Image
                   src="/QR.jpeg"
                   alt={language === 'en' ? "QR Code" : "คิวอาร์โค้ด"}
                   fill
-                  sizes="100px"
-                  className="object-contain"
+                  sizes="(max-width: 640px) 80px, 100px"
+                  className="object-contain rounded-lg shadow-sm"
                 />
               </div>
             </div>
@@ -245,13 +247,13 @@ export default function PumpServiceChecklist() {
       </div>
 
       {/* Form Content */}
-      <div className="p-6 space-y-8">
+      <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
         {/* Customer Details */}
-        <section className="space-y-6">
-          <h2 className="text-lg font-semibold pb-2 border-b text-gray-800">
+        <section className="space-y-4 sm:space-y-6">
+          <h2 className="text-lg font-semibold pb-2 border-b text-gray-900">
             {language === 'en' ? '1. Customer Details' : '1. รายละเอียดลูกค้า'}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-2">
               <Label htmlFor="company" className="text-gray-700">
                 {language === 'en' ? 'Company Name' : 'ชื่อบริษัท'}
@@ -263,7 +265,7 @@ export default function PumpServiceChecklist() {
                 value={formData.company}
                 onChange={handleInputChange}
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -277,7 +279,7 @@ export default function PumpServiceChecklist() {
                 value={formData.site_location}
                 onChange={handleInputChange}
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -291,7 +293,7 @@ export default function PumpServiceChecklist() {
                 value={formData.contact_person}
                 onChange={handleInputChange}
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -305,7 +307,7 @@ export default function PumpServiceChecklist() {
                 value={formData.department}
                 onChange={handleInputChange}
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -319,7 +321,7 @@ export default function PumpServiceChecklist() {
                 value={formData.phone}
                 onChange={handleInputChange}
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -333,7 +335,7 @@ export default function PumpServiceChecklist() {
                 value={formData.email}
                 onChange={handleInputChange}
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
           </div>
@@ -341,7 +343,7 @@ export default function PumpServiceChecklist() {
 
         {/* Pump Information */}
         <section className="space-y-6">
-          <h2 className="text-lg font-semibold pb-2 border-b text-gray-800">
+          <h2 className="text-lg font-semibold pb-2 border-b text-gray-900">
             {language === 'en' ? '2. Pump Information' : '2. ข้อมูลปั๊ม'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -356,7 +358,7 @@ export default function PumpServiceChecklist() {
                 value={formData.pump_model}
                 onChange={handleInputChange}
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -370,7 +372,7 @@ export default function PumpServiceChecklist() {
                 value={formData.serial_number}
                 onChange={handleInputChange}
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -383,7 +385,7 @@ export default function PumpServiceChecklist() {
                 name="manufacture_year" 
                 value={formData.manufacture_year}
                 onChange={handleInputChange}
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -396,7 +398,7 @@ export default function PumpServiceChecklist() {
                 name="operating_hours" 
                 value={formData.operating_hours}
                 onChange={handleInputChange}
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -409,7 +411,7 @@ export default function PumpServiceChecklist() {
                 name="last_service_date" 
                 value={formData.last_service_date}
                 onChange={handleInputChange}
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -422,7 +424,7 @@ export default function PumpServiceChecklist() {
                 name="installation_date" 
                 value={formData.installation_date}
                 onChange={handleInputChange}
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
           </div>
@@ -430,7 +432,7 @@ export default function PumpServiceChecklist() {
 
         {/* Operating Conditions */}
         <section className="space-y-6">
-          <h2 className="text-lg font-semibold pb-2 border-b text-gray-800">
+          <h2 className="text-lg font-semibold pb-2 border-b text-gray-900">
             {language === 'en' ? '3. Operating Conditions' : '3. สภาวะการทำงานจริง'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -446,7 +448,7 @@ export default function PumpServiceChecklist() {
                 onChange={handleInputChange}
                 step="0.1"
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -461,7 +463,7 @@ export default function PumpServiceChecklist() {
                 onChange={handleInputChange}
                 step="0.1"
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -476,7 +478,7 @@ export default function PumpServiceChecklist() {
                 onChange={handleInputChange}
                 step="0.1"
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -491,12 +493,12 @@ export default function PumpServiceChecklist() {
                 onChange={handleInputChange}
                 step="0.1"
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="total_head" className="text-gray-700">
-                {language === 'en' ? 'Total Head (m)' : 'เฮดรวม (m)'}
+                {language === 'en' ? 'Total Head (m)' : 'เฮดรว��� (m)'}
               </Label>
               <Input 
                 id="total_head"
@@ -506,7 +508,7 @@ export default function PumpServiceChecklist() {
                 onChange={handleInputChange}
                 step="0.1"
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
             <div className="space-y-2">
@@ -520,7 +522,7 @@ export default function PumpServiceChecklist() {
                 value={formData.pumped_medium}
                 onChange={handleInputChange}
                 required 
-                className="w-full"
+                className="w-full transition-shadow focus:ring-2 focus:ring-primary/20"
               />
             </div>
           </div>
@@ -534,14 +536,14 @@ export default function PumpServiceChecklist() {
               value={formData.service_reason}
               onChange={handleInputChange}
               required 
-              className="min-h-[100px] w-full"
+              className="min-h-[100px] w-full transition-shadow focus:ring-2 focus:ring-primary/20"
             />
           </div>
         </section>
 
         {/* Checklist */}
         <section className="space-y-6">
-          <h2 className="text-lg font-semibold pb-2 border-b text-gray-800">
+          <h2 className="text-lg font-semibold pb-2 border-b text-gray-900">
             {language === 'en' ? '4. Customer Preparation Checklist' : '4. รายการเตรียมความพร้อมของลูกค้า'}
           </h2>
           <div className="space-y-6">
@@ -620,7 +622,7 @@ export default function PumpServiceChecklist() {
                   <Label htmlFor="alignment_report" className="text-sm">
                     {language === 'en' 
                       ? 'Alignment report available' 
-                      : 'มีรายงานการปรับแนวเพลา'}
+                      : 'มีร��ยงานการปรับแนวเพลา'}
                   </Label>
                 </div>
 
@@ -768,15 +770,15 @@ export default function PumpServiceChecklist() {
 
         {/* Important Notes */}
         <section className="space-y-6">
-          <h2 className="text-lg font-semibold pb-2 border-b text-gray-800">
+          <h2 className="text-lg font-semibold pb-2 border-b text-gray-900">
             {language === 'en' ? 'Important Notes:' : 'หมายเหตุสำคัญ:'}
           </h2>
           <div className="bg-gray-50 p-6 rounded-lg border">
             <ul className="list-disc pl-5 space-y-3 text-gray-700">
               <li>{language === 'en' ? 'All work must be performed by qualified personnel only' : 'งานทั้งหมดต้องดำเนินการโดยบุคลากรที่มีคุณสมบัติเท่านั้น'}</li>
               <li>{language === 'en' ? 'Follow all safety protocols and guidelines' : 'ปฏิบัติตามขั้นตอนและแนวทางด้านความปลอดภัยทั้งหมด'}</li>
-              <li>{language === 'en' ? 'Maintain proper documentation throughout the service process' : 'รักษาเกสารที่เหมาะสมตลอดกระบวนการให้บริการ'}</li>
-              <li>{language === 'en' ? 'Use only OEM parts or approved equivalents' : 'ใช้เฉพาะช��้นส่วน OEM หรือชิ้นส่วนที่ได้รับการอนุมัติเท่านั้น'}</li>
+              <li>{language === 'en' ? 'Maintain proper documentation throughout the service process' : 'รักษาเกสารที่เหมาะสมตลอดกระบวนการให��บริการ'}</li>
+              <li>{language === 'en' ? 'Use only OEM parts or approved equivalents' : 'ใช้เฉพาะชิ้นส่วน OEM หรือชิ้นส่วนที่ได้รับการอนุมัติเท่านั้น'}</li>
               <li>{language === 'en' ? 'Follow all safety protocols, especially regarding magnetic coupling hazards' : 'ปฏิบัติตามโปรโตคอลความปลอดภัยทั้งหมด โดยเฉพาะอย่างยิ่งเกี่ยวกับอันตรายจากการเชื่อมต่อแม่เหล็ก'}</li>
               <li>{language === 'en' ? "Refer to manufacturer's manual for specific torque values and clearances" : 'อ้างอิงคู่มือของผู้ผลิตสำหรับค่าแรงบิดและระยะห่างที่เฉพาะเจาะจง'}</li>
               <li>{language === 'en' ? 'Required for magnetic coupling handling - keep sensitive items at minimum 1m distance' : 'จำเป็นสำหรับการจัดการการเชื่อมต่อแม่เหล็ก - เก็บรักษาอุปกรณ์ที่มีความอ่อนไหวในระยะห่างอย่างน้อย 1 เมตร'}</li>
@@ -786,9 +788,13 @@ export default function PumpServiceChecklist() {
       </div>
 
       {/* Submit Button */}
-      <div className="border-t p-6 bg-gray-50/50">
+      <div className="border-t p-4 sm:p-6 bg-gradient-to-b from-gray-50/50 to-white">
         <div className="flex justify-end">
-          <Button type="submit" size="lg">
+          <Button 
+            type="submit" 
+            size="lg" 
+            className="w-full sm:w-auto shadow-lg hover:shadow-xl transition-all bg-primary hover:bg-primary/90"
+          >
             {language === 'en' ? 'Generate PDF' : 'สร้าง PDF'}
           </Button>
         </div>
