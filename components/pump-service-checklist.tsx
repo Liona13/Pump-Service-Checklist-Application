@@ -41,12 +41,12 @@ type CheckboxId =
   | 'sds'
   | 'alignment_report'
   | 'operation_records'
-  | 'power_isolation'
+  | 'power_isolated'
   | 'valves_locked'
   | 'pump_drained'
-  | 'aux_systems'
-  | 'coupling_guard'
-  | 'coupling'
+  | 'auxiliary_disconnected'
+  | 'coupling_guard_removed'
+  | 'coupling_disconnected'
   | 'pump_cleaned'
   | 'openings_protected'
   | 'photos_taken';
@@ -83,12 +83,12 @@ export default function PumpServiceChecklist() {
     sds: false,
     alignment_report: false,
     operation_records: false,
-    power_isolation: false,
+    power_isolated: false,
     valves_locked: false,
     pump_drained: false,
-    aux_systems: false,
-    coupling_guard: false,
-    coupling: false,
+    auxiliary_disconnected: false,
+    coupling_guard_removed: false,
+    coupling_disconnected: false,
     pump_cleaned: false,
     openings_protected: false,
     photos_taken: false,
@@ -230,7 +230,9 @@ export default function PumpServiceChecklist() {
               <div className="text-sm text-gray-600 space-y-1">
                 <p>{language === 'en' ? "Document No: FM-WFA-SER-057" : "เลขที่เอกสาร: FM-WFA-SER-057"}</p>
                 <p>{language === 'en' ? "Revision: 00" : "แก้ไขครั้งที่: 00"}</p>
-                <p>{language === 'en' ? "Date: 15.11.2024" : "วันที่: 15.11.2024"}</p>
+                <p>{language === 'en' 
+                  ? `Date: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/').join('.')}` 
+                  : `วันที่: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/').join('.')}`}</p>
               </div>
               <div className="w-[80px] sm:w-[100px] h-[80px] sm:h-[100px] relative ml-0 lg:ml-auto">
                 <Image
@@ -498,7 +500,7 @@ export default function PumpServiceChecklist() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="total_head" className="text-gray-700">
-                {language === 'en' ? 'Total Head (m)' : 'เฮดรว��� (m)'}
+                {language === 'en' ? 'Total Head (m)' : 'เฮดรว (m)'}
               </Label>
               <Input 
                 id="total_head"
@@ -580,7 +582,7 @@ export default function PumpServiceChecklist() {
                   <Input 
                     type="number" 
                     name="training_hours" 
-                    placeholder={language === 'en' ? 'Hours' : 'ชั่วโมง'}
+                    placeholder={language === 'en' ? 'Hours' : 'ชัวโมง'}
                     className="w-24 h-8 text-sm" 
                     value={formData.training_hours}
                     onChange={handleInputChange}
@@ -622,7 +624,7 @@ export default function PumpServiceChecklist() {
                   <Label htmlFor="alignment_report" className="text-sm">
                     {language === 'en' 
                       ? 'Alignment report available' 
-                      : 'มีร��ยงานการปรับแนวเพลา'}
+                      : 'มีรยงานการปรับแนวเพลา'}
                   </Label>
                 </div>
 
@@ -649,11 +651,11 @@ export default function PumpServiceChecklist() {
               <div className="grid gap-4">
                 <div className="flex items-center gap-3">
                   <Checkbox 
-                    id="power_isolation" 
-                    checked={checkboxes.power_isolation}
-                    onCheckedChange={() => handleCheckboxChange('power_isolation')}
+                    id="power_isolated" 
+                    checked={checkboxes.power_isolated}
+                    onCheckedChange={() => handleCheckboxChange('power_isolated')}
                   />
-                  <Label htmlFor="power_isolation" className="text-sm">
+                  <Label htmlFor="power_isolated" className="text-sm">
                     {language === 'en' 
                       ? 'Pump isolated from power supply (customer responsibility)' 
                       : 'ตัดแยกปั๊มออกจากแหล่งจ่ายไฟ (ความรับผิดชอบของลูกค้า)'}
@@ -688,11 +690,11 @@ export default function PumpServiceChecklist() {
 
                 <div className="flex items-center gap-3">
                   <Checkbox 
-                    id="aux_systems" 
-                    checked={checkboxes.aux_systems}
-                    onCheckedChange={() => handleCheckboxChange('aux_systems')}
+                    id="auxiliary_disconnected" 
+                    checked={checkboxes.auxiliary_disconnected}
+                    onCheckedChange={() => handleCheckboxChange('auxiliary_disconnected')}
                   />
-                  <Label htmlFor="aux_systems" className="text-sm">
+                  <Label htmlFor="auxiliary_disconnected" className="text-sm">
                     {language === 'en' 
                       ? 'Auxiliary systems disconnected (e.g., external sensors)' 
                       : 'ตัดการเชื่อมต่อระบบที่เกี่ยวข้อง (เช่น เซนเซอร์ภายนอก)'}
@@ -701,11 +703,11 @@ export default function PumpServiceChecklist() {
 
                 <div className="flex items-center gap-3">
                   <Checkbox 
-                    id="coupling_guard" 
-                    checked={checkboxes.coupling_guard}
-                    onCheckedChange={() => handleCheckboxChange('coupling_guard')}
+                    id="coupling_guard_removed" 
+                    checked={checkboxes.coupling_guard_removed}
+                    onCheckedChange={() => handleCheckboxChange('coupling_guard_removed')}
                   />
-                  <Label htmlFor="coupling_guard" className="text-sm">
+                  <Label htmlFor="coupling_guard_removed" className="text-sm">
                     {language === 'en' 
                       ? 'Coupling guard removed' 
                       : 'ถอดฝาครอบคัปปลิ้ง'}
@@ -714,11 +716,11 @@ export default function PumpServiceChecklist() {
 
                 <div className="flex items-center gap-3">
                   <Checkbox 
-                    id="coupling" 
-                    checked={checkboxes.coupling}
-                    onCheckedChange={() => handleCheckboxChange('coupling')}
+                    id="coupling_disconnected" 
+                    checked={checkboxes.coupling_disconnected}
+                    onCheckedChange={() => handleCheckboxChange('coupling_disconnected')}
                   />
-                  <Label htmlFor="coupling" className="text-sm">
+                  <Label htmlFor="coupling_disconnected" className="text-sm">
                     {language === 'en' 
                       ? 'Coupling disconnected' 
                       : 'ถอดคัปปลิ้ง'}
@@ -777,7 +779,7 @@ export default function PumpServiceChecklist() {
             <ul className="list-disc pl-5 space-y-3 text-gray-700">
               <li>{language === 'en' ? 'All work must be performed by qualified personnel only' : 'งานทั้งหมดต้องดำเนินการโดยบุคลากรที่มีคุณสมบัติเท่านั้น'}</li>
               <li>{language === 'en' ? 'Follow all safety protocols and guidelines' : 'ปฏิบัติตามขั้นตอนและแนวทางด้านความปลอดภัยทั้งหมด'}</li>
-              <li>{language === 'en' ? 'Maintain proper documentation throughout the service process' : 'รักษาเกสารที่เหมาะสมตลอดกระบวนการให��บริการ'}</li>
+              <li>{language === 'en' ? 'Maintain proper documentation throughout the service process' : 'รักษาเกสารที่เหมาะสมตลอดกระบวนการใหบริการ'}</li>
               <li>{language === 'en' ? 'Use only OEM parts or approved equivalents' : 'ใช้เฉพาะชิ้นส่วน OEM หรือชิ้นส่วนที่ได้รับการอนุมัติเท่านั้น'}</li>
               <li>{language === 'en' ? 'Follow all safety protocols, especially regarding magnetic coupling hazards' : 'ปฏิบัติตามโปรโตคอลความปลอดภัยทั้งหมด โดยเฉพาะอย่างยิ่งเกี่ยวกับอันตรายจากการเชื่อมต่อแม่เหล็ก'}</li>
               <li>{language === 'en' ? "Refer to manufacturer's manual for specific torque values and clearances" : 'อ้างอิงคู่มือของผู้ผลิตสำหรับค่าแรงบิดและระยะห่างที่เฉพาะเจาะจง'}</li>

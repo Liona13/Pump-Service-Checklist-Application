@@ -54,6 +54,15 @@ interface Checkboxes {
   sds: boolean;
   alignment_report: boolean;
   operation_records: boolean;
+  power_isolated: boolean;
+  valves_locked: boolean;
+  pump_drained: boolean;
+  auxiliary_disconnected: boolean;
+  coupling_guard_removed: boolean;
+  coupling_disconnected: boolean;
+  pump_cleaned: boolean;
+  openings_protected: boolean;
+  photos_taken: boolean;
 }
 
 interface CanvasRect {
@@ -226,7 +235,7 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
           ? `Safety Training required? ${formData.training_hours ? `(${formData.training_hours} hours)` : ''}`
           : `ต้องรารการฝึกอบรมความปลอดภัยหรือไม่? ${formData.training_hours ? `(${formData.training_hours} ชั่วโมง)` : ''}`),
       createCheckboxItem(checkboxes.harmless_form,
-        language === 'en' ? 'Declaration of Harmlessness form (in the operation manual)' : 'แบบฟอร์มการประกาศความไม่เป็นอันตราย (ในคู่มือการใช้งาน)'),
+        language === 'en' ? 'Declaration of Harmlessness form (in the operation manual)' : 'แบบฟอร์มการประกาศความไม่เป็นอันตราย (ในคู่มือการใช้าน)'),
       createCheckboxItem(checkboxes.sds,
         language === 'en' ? 'Safety Data Sheet (SDS) available' : 'มีเอกสารขมูลความปลอดภัย (SDS)'),
       createCheckboxItem(checkboxes.alignment_report,
@@ -249,9 +258,13 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
         en: '3. Operating Conditions',
         th: '3. สภาวะการทำงานจริง'
       },
+      pumpPreparation: {
+        en: '4. Pump Preparation (By Customer or WFA)',
+        th: '4. การเตรียมปั๊ม (โดยลูกค้าหรือ WFA)'
+      },
       preparationChecklist: {
-        en: '4. Customer Preparation Checklist',
-        th: '4. รายการเตรียมความพร้อมของลูกค้า'
+        en: '5. Customer Preparation Checklist',
+        th: '5. รายการเตรียมความพร้มองลูกค้า'
       },
       preServiceRequirements: {
         en: 'Pre-Service Requirements',
@@ -259,7 +272,7 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
       },
       importantNotes: {
         en: 'Important Notes:',
-        th: 'หลายเหตุำคัญ:'
+        th: 'หลายเหตุสำคัญ:'
       }
     };
 
@@ -270,34 +283,49 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
         th: 'งานทั้งหมดต้องดำเนินการโดยบุคลากรที่มีคุณสมบัติเท่านั้น'
       },
       {
+        en: 'Follow all safety protocols and guidelines',
+        th: 'ปฏิบัติตามขั้นตอนและแนวทางด้านความปลอดภัยทั้งหมด'
+      },
+      {
         en: 'Maintain proper documentation throughout the service process',
-        th: 'รักษาเอกสารที่เหมาะสมลอดกระบวนการให้บริการ'
+        th: 'รักษาเอกสารที่เหมาะสมตลอดกระบวนการให้บริการ'
       },
       {
         en: 'Use only OEM parts or approved equivalents',
-        th: 'ใช้เฉพาะชิ้นส่วน OEM หรือชิ้นส่วนที่ได้รับกรอนุมัติเท่านั้น'
+        th: 'ใช้เฉพาะชิ้นส่วน OEM หรือชิ้นส��วนที่ได้รับการอนุมัติเท่านั้น'
       },
       {
         en: 'Follow all safety protocols, especially regarding magnetic coupling hazards',
         th: 'ปฏิบัติตามโปรโตคอลความปลอดภัยทั้งหมด โดยเฉพาะอย่างยิ่งเกี่ยวกับอันตรายจากการเชื่อมต่อแม่เหล็ก'
+      },
+      {
+        en: "Refer to manufacturer's manual for specific torque values and clearances",
+        th: 'อ้างอิงคู่มือของผู้ผลิตสำหรับค่าแรงบิดและระยะห่างที่เฉพาะเจาะจง'
+      },
+      {
+        en: 'Required for magnetic coupling handling - keep sensitive items at minimum 1m distance',
+        th: 'จำเป็นสำหรับการจัดการการเชื่อมต่อแม่เหล็ก - เก็บรักษาอุปกรณ์ที่มีความอ่อนไหวในระยะห่างอย่างน้อย 1 เมตร'
       }
     ];
 
     // Document header
     const docHeader = {
-      company: { en: 'Water Field Asia Co., Ltd.', th: 'บริษัท วอเตอร์ฟิลด์ เอเชีย จำกัด' },
+      company: { en: 'Water Field Asia Co., Ltd.', th: 'บริษ���ท วอเตอร์ฟิลด์ เอเชีย จำกัด' },
       address1: { en: '623 Soi Onnut 70/1 Sub 2', th: '623 ซอยอ่อนนุช 70/1 แยก 2' },
       address2: { en: 'Pravet Sub-District, Pravet District,', th: 'แขวงประเวศ เขตประเวศ' },
       address3: { en: 'Bangkok 10250', th: 'กรุงเทพมหานคร 10250' },
       phone: { en: 'Tel.: +66 2320 1994', th: 'โทร: +66 2320 1994' },
       docNo: { en: 'Document No: FM-WFA-SER-057', th: 'เลขที่เอกสาร: FM-WFA-SER-057' },
       revision: { en: 'Revision: 00', th: 'แก้ไขครั้งที่: 00' },
-      date: { en: 'Date: 15.11.2024', th: 'วันที่: 15.11.2024' }
+      date: { 
+        en: `Date: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/').join('.')}`,
+        th: `วันที่: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/').join('.')}`
+      }
     };
 
     // Thai translations for form fields
     const translations = {
-      company: { en: 'Company:', th: 'บริษัท:' },
+      company: { en: 'Company:', th: 'บริษท:' },
       siteLocation: { en: 'Site Location:', th: 'สถานที่ติดตั้ง:' },
       contactPerson: { en: 'Contact Person:', th: 'ผู้ติดต่อ:' },
       department: { en: 'Department:', th: 'แผนก:' },
@@ -305,13 +333,13 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
       email: { en: 'Email:', th: 'อีเมล:' },
       pumpModel: { en: 'Pump Model:', th: 'รุ่นปั๊ม:' },
       serialNumber: { en: 'Serial Number:', th: 'หมายเลขเครื่อง:' },
-      yearOfManufacture: { en: 'Year of Manufacture:', th: 'ปีที่ผลิต:' },
+      yearOfManufacture: { en: 'Year of Manufacture:', th: 'ปีท่ผลิต:' },
       operatingHours: { en: 'Operating Hours:', th: 'ชั่วโมงการทำงาน:' },
       lastServiceDate: { en: 'Last Service Date:', th: 'วันที่เข้าซ่อมครั้งล่าสุด:' },
       installationDate: { en: 'Installation Date:', th: 'วันที่ติดตั้ง:' },
       temperature: { en: 'Temperature (°C):', th: 'อุณหภูมิ (°C):' },
       flowRate: { en: 'Flow Rate (m³/h):', th: 'อัตราการไหล (m³/h):' },
-      suctionPressure: { en: 'Suction Pressure (bar):', th: 'แรงดันด���านดูด (bar):' },
+      suctionPressure: { en: 'Suction Pressure (bar):', th: 'แรงดันด้านดูด (bar):' },
       dischargePressure: { en: 'Discharge Pressure (bar):', th: 'แรงดันด้านส่ง (bar):' },
       totalHead: { en: 'Total Head (m):', th: 'เฮดรมม (m):' },
       pumpedMedium: { en: 'Pumped Medium:', th: 'ของเหลวที่สูบ:' },
@@ -348,37 +376,40 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
         {
           columns: [
             {
-              width: 150,
-              image: logoBase64,
-              fit: [150, 75],
-              margin: [0, 0, 20, 0]
-            },
-            {
               width: '*',
               stack: [
+                {
+                  image: logoBase64,
+                  width: 120,
+                  height: 60,
+                  margin: [0, 0, 0, 10]
+                },
                 { text: docHeader.company[language], style: 'headerCompany' },
                 { text: docHeader.address1[language], style: 'headerAddress' },
-                { text: docHeader.address2[language], style: 'headerAddress' },
-                { text: docHeader.address3[language], style: 'headerAddress' },
-                { text: docHeader.phone[language], style: 'headerAddress' }
-              ],
-              margin: [0, 5, 0, 0]
+                { text: docHeader.address2[language], style: 'headerAddress', margin: [0, 10, 0, 0] },
+                { text: docHeader.address3[language], style: 'headerAddress', margin: [0, 10, 0, 0] },
+                { text: docHeader.phone[language], style: 'headerAddress', margin: [0, 10, 0, 0] }
+              ]
             },
             {
               width: 'auto',
               stack: [
-                { text: docHeader.docNo[language], style: 'headerDoc' },
-                { text: docHeader.revision[language], style: 'headerDoc' },
-                { text: docHeader.date[language], style: 'headerDoc' },
+                {
+                  stack: [
+                    { text: docHeader.docNo[language], style: 'headerDoc' },
+                    { text: docHeader.revision[language], style: 'headerDoc', margin: [0, 10, 0, 0] },
+                    { text: docHeader.date[language], style: 'headerDoc', margin: [0, 10, 0, 0] }
+                  ]
+                },
                 {
                   image: qrBase64,
-                  width: 60,
-                  height: 60,
-                  margin: [0, 5, 0, 0],
-                  alignment: 'right'
+                  width: 50,
+                  height: 50,
+                  alignment: 'right',
+                  margin: [0, 35, 0, 0]
                 }
               ],
-              margin: [20, 5, 0, 0]
+              margin: [40, 0, 0, 0]
             }
           ],
           margin: [0, 0, 0, 20]
@@ -469,6 +500,40 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
             }
           ]
         },
+        // Pump Preparation section
+        {
+          unbreakable: true,
+          stack: [
+            {
+              text: sectionTitles.pumpPreparation[language],
+              style: 'sectionHeader',
+              margin: [0, 20, 0, 10]
+            },
+            {
+              stack: [
+                createCheckboxItem(checkboxes.power_isolated, 
+                  language === 'en' ? 'Pump isolated from power supply (customer responsibility)' : 'ปั๊มถูกตัดแยกจากแหล่งจ่ายไฟ (ความรับผิดชอบของลูกค้า)'),
+                createCheckboxItem(checkboxes.valves_locked,
+                  language === 'en' ? 'Suction/discharge valves locked (customer responsibility)' : 'วาล์วดูด/จ่ายถูกล็อค (ความรับผิดชอบของลูกค้า)'),
+                createCheckboxItem(checkboxes.pump_drained,
+                  language === 'en' ? 'Pump drained (customer responsibility)' : 'ระบายของเหลวออกจากปั๊ม (ความรับผิดชอบของลูกค้า)'),
+                createCheckboxItem(checkboxes.auxiliary_disconnected,
+                  language === 'en' ? 'Auxiliary systems disconnected (e.g., external sensors)' : 'ระบบเสริมถูกตัดการเชื่อมต่อ (เช่น เซ็นเอรภายนอก)'),
+                createCheckboxItem(checkboxes.coupling_guard_removed,
+                  language === 'en' ? 'Coupling guard removed' : 'ฝาครอบคัปปลิ้งถูกถอดออก'),
+                createCheckboxItem(checkboxes.coupling_disconnected,
+                  language === 'en' ? 'Coupling disconnected' : 'คัปปลิ้งถูกถอดออก'),
+                createCheckboxItem(checkboxes.pump_cleaned,
+                  language === 'en' ? 'Pump cleaned externally' : 'ทำความสะอาดภายนอกปั๊ม'),
+                createCheckboxItem(checkboxes.openings_protected,
+                  language === 'en' ? 'All openings protected' : 'ช่องเปิดทั้งหมดได้รับการป้องกัน'),
+                createCheckboxItem(checkboxes.photos_taken,
+                  language === 'en' ? 'Photographs taken (if possible)' : 'ถ่ายภาพ (ถ้าเป็นไปได้)')
+              ],
+              margin: [0, 10, 0, 20]
+            }
+          ]
+        },
         // Customer Preparation Checklist section
         {
           unbreakable: true,
@@ -509,22 +574,21 @@ export async function generatePDF(formData: FormData, checkboxes: Checkboxes, la
           margin: [0, 0, 0, 20]
         },
         headerCompany: {
-          fontSize: 16,
+          fontSize: 14,
           bold: true,
           color: '#111827',
-          margin: [0, 0, 0, 5]
+          margin: [0, 0, 0, 10]
         },
         headerAddress: {
-          fontSize: 10,
+          fontSize: 9,
           color: '#4B5563',
-          lineHeight: 1.4
+          lineHeight: 1.2
         },
         headerDoc: {
-          fontSize: 10,
+          fontSize: 9,
           color: '#4B5563',
-          lineHeight: 1.4,
-          alignment: 'right',
-          margin: [0, 0, 0, 2]
+          lineHeight: 1.2,
+          alignment: 'right'
         },
         sectionHeader: {
           fontSize: 14,
