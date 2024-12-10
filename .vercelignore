@@ -1,0 +1,10 @@
+.git
+.env
+node_modules
+.next
+README.md
+.gitignore
+.eslintrc.json
+yarn-error.log
+npm-debug.log
+.DS_Store 
